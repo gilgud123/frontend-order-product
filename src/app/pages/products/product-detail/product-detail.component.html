@@ -1,0 +1,65 @@
+<div class="product-detail-container">
+  <app-loading-spinner [isLoading]="isLoading"></app-loading-spinner>
+
+  @if (error) {
+    <div class="error-message">
+      {{ error }}
+    </div>
+  }
+
+  @if (product && !isLoading) {
+    <div class="product-detail">
+      <div class="header">
+        <h1>{{ product.name }}</h1>
+        @if (isAdmin) {
+          <div class="actions">
+            <a [routerLink]="['/products', product.id, 'edit']" class="btn btn-primary">Edit</a>
+            <button (click)="deleteProduct()" class="btn btn-danger">Delete</button>
+          </div>
+        }
+      </div>
+
+      <div class="product-info">
+        <div class="info-row">
+          <label>Description:</label>
+          <p>{{ product.description || 'No description available' }}</p>
+        </div>
+
+        <div class="info-row">
+          <label>Price:</label>
+          <p class="price">${{ product.price | number:'1.2-2' }}</p>
+        </div>
+
+        <div class="info-row">
+          <label>Stock Quantity:</label>
+          <p [class.low-stock]="product.stockQuantity < 10">{{ product.stockQuantity }}</p>
+        </div>
+
+        @if (product.category) {
+          <div class="info-row">
+            <label>Category:</label>
+            <p>{{ product.category }}</p>
+          </div>
+        }
+
+        @if (product.createdAt) {
+          <div class="info-row">
+            <label>Created:</label>
+            <p>{{ product.createdAt | date:'medium' }}</p>
+          </div>
+        }
+
+        @if (product.updatedAt) {
+          <div class="info-row">
+            <label>Last Updated:</label>
+            <p>{{ product.updatedAt | date:'medium' }}</p>
+          </div>
+        }
+      </div>
+
+      <div class="back-link">
+        <a routerLink="/products" class="btn btn-secondary">Back to Products</a>
+      </div>
+    </div>
+  }
+</div>

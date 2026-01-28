@@ -1,0 +1,52 @@
+<div class="product-list-container">
+  <div class="header">
+    <h1>Products</h1>
+    @if (isAdmin) {
+      <a routerLink="/products/new" class="btn btn-primary">
+        Add New Product
+      </a>
+    }
+  </div>
+
+  <app-search-bar (search)="onSearch($event)" placeholder="Search products..."></app-search-bar>
+
+  <app-loading-spinner [isLoading]="isLoading" message="Loading products..."></app-loading-spinner>
+
+  @if (error) {
+    <div class="error-message">
+      {{ error }}
+    </div>
+  }
+
+  @if (!isLoading && products.length > 0) {
+    <div class="product-grid">
+      @for (product of products; track product.id) {
+        <div class="product-card">
+          <h3>{{ product.name }}</h3>
+          <p class="description">{{ product.description }}</p>
+          <p class="price">${{ product.price | number:'1.2-2' }}</p>
+          <p class="stock">Stock: {{ product.stockQuantity }}</p>
+          <div class="actions">
+            <a [routerLink]="['/products', product.id]" class="btn btn-secondary">View Details</a>
+            @if (isAdmin) {
+              <a [routerLink]="['/products', product.id, 'edit']" class="btn btn-primary">Edit</a>
+              <button (click)="deleteProduct(product.id!)" class="btn btn-danger">Delete</button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  @if (!isLoading && products.length === 0) {
+    <div class="no-results">
+      No products found.
+    </div>
+  }
+
+  <app-pagination
+    [currentPage]="currentPage"
+    [totalPages]="totalPages"
+    (pageChange)="onPageChange($event)">
+  </app-pagination>
+</div>

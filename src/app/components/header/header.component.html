@@ -1,0 +1,29 @@
+<header class="app-header">
+  <div class="header-container">
+    <div class="header-left">
+      <a routerLink="/" class="logo">
+        <h1>Product Order System</h1>
+      </a>
+    </div>
+
+    <nav class="header-nav">
+      @if (isAuthenticated$ | async) {
+        <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+        <a routerLink="/products" routerLinkActive="active">Products</a>
+        <a routerLink="/orders/my-orders" routerLinkActive="active">My Orders</a>
+      }
+    </nav>
+
+    <div class="header-right">
+      @if (isAuthenticated$ | async; as isAuth) {
+        <div class="user-menu">
+          <span class="user-name">{{ (userName$ | async) || 'User' }}</span>
+          <a routerLink="/profile" class="btn btn-sm">Profile</a>
+          <button (click)="logout()" class="btn btn-sm btn-outline">Logout</button>
+        </div>
+      } @else {
+        <a routerLink="/login" class="btn btn-primary">Login</a>
+      }
+    </div>
+  </div>
+</header>

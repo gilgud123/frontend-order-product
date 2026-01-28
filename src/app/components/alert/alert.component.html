@@ -1,0 +1,19 @@
+@if (isVisible) {
+  <div class="alert" [class]="'alert-' + type">
+    <div class="alert-content">
+      <span class="alert-icon">
+        @if (type === 'success') { ? }
+        @if (type === 'info') { ? }
+        @if (type === 'warning') { ? }
+        @if (type === 'error') { ? }
+      </span>
+      <span class="alert-message">
+        {{ message }}
+        <ng-content></ng-content>
+      </span>
+    </div>
+    @if (dismissible) {
+      <button class="alert-close" (click)="dismiss()" aria-label="Close">×</button>
+    }
+  </div>
+}

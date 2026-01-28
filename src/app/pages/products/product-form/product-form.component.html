@@ -1,0 +1,93 @@
+<div class="product-form-container">
+  <h1>{{ isEditMode ? 'Edit Product' : 'Create New Product' }}</h1>
+
+  @if (error) {
+    <div class="error-message">
+      {{ error }}
+    </div>
+  }
+
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="name">Product Name *</label>
+      <input
+        id="name"
+        type="text"
+        formControlName="name"
+        class="form-control"
+        [class.is-invalid]="isFieldInvalid('name')"
+      />
+      @if (isFieldInvalid('name')) {
+        <div class="error-text">
+          {{ getFieldError('name') }}
+        </div>
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea
+        id="description"
+        formControlName="description"
+        class="form-control"
+        rows="4"
+      ></textarea>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="price">Price *</label>
+        <input
+          id="price"
+          type="number"
+          formControlName="price"
+          class="form-control"
+          step="0.01"
+          [class.is-invalid]="isFieldInvalid('price')"
+        />
+        @if (isFieldInvalid('price')) {
+          <div class="error-text">
+            {{ getFieldError('price') }}
+          </div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="stockQuantity">Stock Quantity *</label>
+        <input
+          id="stockQuantity"
+          type="number"
+          formControlName="stockQuantity"
+          class="form-control"
+          [class.is-invalid]="isFieldInvalid('stockQuantity')"
+        />
+        @if (isFieldInvalid('stockQuantity')) {
+          <div class="error-text">
+            {{ getFieldError('stockQuantity') }}
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="category">Category</label>
+      <input
+        id="category"
+        type="text"
+        formControlName="category"
+        class="form-control"
+      />
+    </div>
+
+    <div class="form-actions">
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="isSubmitting || productForm.invalid"
+      >
+        {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Update' : 'Create') }}
+      </button>
+      <a routerLink="/products" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
