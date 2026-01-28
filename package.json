@@ -1,0 +1,25 @@
+{
+  "name": "frontend-order-product",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "npm --prefix frontend-order-rpoduct run ng",
+    "start": "npm --prefix frontend-order-rpoduct start",
+    "build": "npm --prefix frontend-order-rpoduct run build",
+    "watch": "npm --prefix frontend-order-rpoduct run watch",
+    "test": "npm --prefix frontend-order-rpoduct test",
+    "start:proxy": "npm --prefix frontend-order-rpoduct start -- --proxy-config=../proxy.conf.json"
+  },
+  "private": true,
+  "dependencies": {
+    "@auth0/angular-jwt": "^5.2.0",
+    "angular-oauth2-oidc": "^20.0.2",
+    "keycloak-js": "^26.2.2"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "cypress": "^15.9.0",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.8.1"
+  }
+}
