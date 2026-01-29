@@ -1,1 +1,162 @@
-<p>user-detail works!</p>
+<div class="user-detail-container">
+  <!-- Header -->
+  <div class="header">
+    <button (click)="goBack()" class="btn btn-back">
+      <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+      </svg>
+      Back to Users
+    </button>
+  </div>
+
+  <!-- Error Message -->
+  @if (error()) {
+    <div class="alert alert-error">
+      <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+        <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+      </svg>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading user details...</p>
+    </div>
+  }
+
+  <!-- User Details -->
+  @if (!isLoading() && hasUser()) {
+    <div class="user-detail-content">
+      <!-- User Profile Card -->
+      <div class="profile-card">
+        <div class="profile-header">
+          <div class="profile-avatar">{{ userInitials() }}</div>
+          <div class="profile-info">
+            <h1 class="profile-name">{{ fullName() }}</h1>
+            <p class="profile-username">&#64;{{ user()!.username }}</p>
+          </div>
+        </div>
+
+        <div class="profile-body">
+          <div class="info-grid">
+            <div class="info-item">
+              <label>User ID:</label>
+              <span>#{{ user()!.id }}</span>
+            </div>
+
+            <div class="info-item">
+              <label>Email:</label>
+              <span class="email">{{ user()!.email }}</span>
+            </div>
+
+            @if (user()!.firstName) {
+              <div class="info-item">
+                <label>First Name:</label>
+                <span>{{ user()!.firstName }}</span>
+              </div>
+            }
+
+            @if (user()!.lastName) {
+              <div class="info-item">
+                <label>Last Name:</label>
+                <span>{{ user()!.lastName }}</span>
+              </div>
+            }
+
+            @if (user()!.createdAt) {
+              <div class="info-item">
+                <label>Member Since:</label>
+                <span>{{ formatDate(user()!.createdAt) }}</span>
+              </div>
+            }
+
+            @if (user()!.updatedAt && user()!.updatedAt !== user()!.createdAt) {
+              <div class="info-item">
+                <label>Last Updated:</label>
+                <span>{{ formatDate(user()!.updatedAt) }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Actions -->
+        @if (isAdmin()) {
+          <div class="profile-actions">
+            <a
+              [routerLink]="['/users', user()!.id, 'edit']"
+              class="btn btn-primary">
+              <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+              </svg>
+              Edit User
+            </a>
+
+            <button
+              (click)="deleteUser()"
+              class="btn btn-danger">
+              <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+              </svg>
+              Delete User
+            </button>
+          </div>
+        }
+      </div>
+
+      <!-- Recent Orders -->
+      <div class="orders-card">
+        <div class="card-header">
+          <h2>Recent Orders</h2>
+          <a [routerLink]="['/orders']" [queryParams]="{userId: user()!.id}" class="btn btn-outline btn-sm">
+            View All Orders
+          </a>
+        </div>
+
+        <div class="card-body">
+          @if (isLoadingOrders()) {
+            <div class="orders-loading">
+              <div class="spinner-small"></div>
+              <p>Loading orders...</p>
+            </div>
+          } @else if (hasOrders()) {
+            <div class="orders-list">
+              @for (order of orders(); track order.id) {
+                <div class="order-item">
+                  <div class="order-info">
+                    <div class="order-id">Order #{{ order.id }}</div>
+                    <div class="order-date">{{ formatDate(order.createdAt) }}</div>
+                  </div>
+                  <div class="order-details">
+                    <span class="order-status" [class]="'status-' + order.status?.toLowerCase()">
+                      {{ order.status }}
+                    </span>
+                    <span class="order-amount">{{ formatCurrency(order.totalAmount) }}</span>
+                  </div>
+                  <a [routerLink]="['/orders', order.id]" class="btn btn-secondary btn-sm">
+                    <svg class="icon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                      <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                    </svg>
+                    View
+                  </a>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="empty-orders">
+              <svg width="48" height="48" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5zM3.14 5l1.25 5h8.22l1.25-5H3.14zM5 13a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0zm9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/>
+              </svg>
+              <p>No orders yet</p>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>
