@@ -1,25 +1,48 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-callback',
-  standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './callback.component.html',
-  styleUrls: ['./callback.component.scss']
+  styleUrls: ['./callback.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CallbackComponent implements OnInit {
-  private router = inject(Router);
-  private authService = inject(AuthService);
+  private readonly router = inject(Router);
 
-  ngOnInit(): void {
-    // Get the redirect URL from session storage
-    const redirectUrl = sessionStorage.getItem('redirectUrl') || '/';
-    sessionStorage.removeItem('redirectUrl');
+  protected readonly isProcessing = signal(true);
+  protected readonly errorMessage = signal<string | null>(null);
 
-    // Navigate to the original destination
-    this.router.navigateByUrl(redirectUrl);
+  async ngOnInit(): Promise<void> {
+    try {
+      // Wait a bit to ensure OAuth flow is complete
+      await this.waitForAuthentication();
+
+      // Get the redirect URL from session storage
+      const redirectUrl = sessionStorage.getItem('redirectUrl') || '/';
+      sessionStorage.removeItem('redirectUrl');
+
+      this.isProcessing.set(false);
+
+      // Navigate to the original destination
+      await this.router.navigateByUrl(redirectUrl);
+    } catch (error) {
+      this.isProcessing.set(false);
+      this.errorMessage.set('Authentication failed. Please try again.');
+      console.error('Callback error:', error);
+
+      // Redirect to home after error
+      setTimeout(() => {
+        this.router.navigate(['/']);
+      }, 3000);
+    }
+  }
+
+  private async waitForAuthentication(): Promise<void> {
+    return new Promise((resolve) => {
+      // Give OAuth service time to process the callback
+      setTimeout(resolve, 1000);
+    });
   }
 }
