@@ -1,8 +1,8 @@
-import { AutoFocus } from './auto-focus';
+import { AutoFocusDirective } from './auto-focus';
 
 describe('AutoFocus', () => {
   it('should create an instance', () => {
-    const directive = new AutoFocus();
+    const directive = new AutoFocusDirective();
     expect(directive).toBeTruthy();
   });
 });

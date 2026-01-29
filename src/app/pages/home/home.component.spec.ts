@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
+import { provideZoneChangeDetection } from '@angular/core';
 import { HomeComponent } from './home.component';
 import { AuthService } from '../../auth';
 import { BehaviorSubject } from 'rxjs';
@@ -8,7 +9,7 @@ describe('HomeComponent', () => {
   let component: HomeComponent;
   let fixture: ComponentFixture<HomeComponent>;
   let mockAuthService: jasmine.SpyObj<AuthService>;
-  let mockRouter: jasmine.SpyObj<Router>;
+  let router: Router;
   let isAuthenticatedSubject: BehaviorSubject<boolean>;
 
   beforeEach(async () => {
@@ -18,18 +19,19 @@ describe('HomeComponent', () => {
       isAuthenticated$: isAuthenticatedSubject.asObservable()
     });
 
-    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-
     await TestBed.configureTestingModule({
       imports: [HomeComponent],
       providers: [
-        { provide: AuthService, useValue: mockAuthService },
-        { provide: Router, useValue: mockRouter }
+        provideZoneChangeDetection({ eventCoalescing: true }),
+        provideRouter([]),
+        { provide: AuthService, useValue: mockAuthService }
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(HomeComponent);
     component = fixture.componentInstance;
+    router = TestBed.inject(Router);
+    spyOn(router, 'navigate');
     fixture.detectChanges();
   });
 
@@ -59,33 +61,19 @@ describe('HomeComponent', () => {
 
     it('should navigate to login when getStarted is called', () => {
       component.getStarted();
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/auth/login']);
+      expect(router.navigate).toHaveBeenCalledWith(['/auth/login']);
     });
 
     it('should navigate to login when login is called', () => {
       component.login();
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/auth/login']);
+      expect(router.navigate).toHaveBeenCalledWith(['/auth/login']);
     });
   });
 
   describe('when user is authenticated', () => {
-    beforeEach(async () => {
-      // Create new test bed with authenticated state
-      isAuthenticatedSubject = new BehaviorSubject<boolean>(true);
-      mockAuthService = jasmine.createSpyObj('AuthService', ['hasRole'], {
-        isAuthenticated$: isAuthenticatedSubject.asObservable()
-      });
-
-      await TestBed.configureTestingModule({
-        imports: [HomeComponent],
-        providers: [
-          { provide: AuthService, useValue: mockAuthService },
-          { provide: Router, useValue: mockRouter }
-        ]
-      }).compileComponents();
-
-      fixture = TestBed.createComponent(HomeComponent);
-      component = fixture.componentInstance;
+    beforeEach(() => {
+      // Update authentication state
+      isAuthenticatedSubject.next(true);
       fixture.detectChanges();
     });
 
@@ -96,7 +84,7 @@ describe('HomeComponent', () => {
 
     it('should navigate to dashboard when getStarted is called', () => {
       component.getStarted();
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard']);
+      expect(router.navigate).toHaveBeenCalledWith(['/dashboard']);
     });
   });
 
@@ -104,7 +92,7 @@ describe('HomeComponent', () => {
     it('should navigate to specified route', () => {
       const testRoute = '/products';
       component.navigateTo(testRoute);
-      expect(mockRouter.navigate).toHaveBeenCalledWith([testRoute]);
+      expect(router.navigate).toHaveBeenCalledWith([testRoute]);
     });
   });
 

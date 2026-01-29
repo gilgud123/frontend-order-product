@@ -1,4 +1,4 @@
-import { AuthConfig } from 'angular-oauth2-oidc';
+import {AuthConfig, JwksValidationHandler} from 'angular-oauth2-oidc';
 
 const getOrigin = (): string => {
   if (typeof window !== 'undefined') {
@@ -8,17 +8,17 @@ const getOrigin = (): string => {
 };
 
 export const authConfig: AuthConfig = {
-  issuer: 'https://localhost:8081/realms/product-rest-api',
-  redirectUri: getOrigin() + '/callback',
-  clientId: 'frontend-spa',
+  issuer: 'http://localhost:8081/realms/product-rest-api', // Changed to http for dev
+  redirectUri: getOrigin() + '/index.html',
+  postLogoutRedirectUri: getOrigin() + '/index.html',
+  clientId: 'frontend-opa',
   responseType: 'code',
   scope: 'openid profile email',
   showDebugInformation: true,
-  requireHttps: false, // set true in production
+  requireHttps: false, // Now consistent with http issuer
   useSilentRefresh: true,
   silentRefreshRedirectUri: getOrigin() + '/silent-refresh.html',
   sessionChecksEnabled: true,
-  clearHashAfterLogin: true,
-  // PKCE is enabled by default when using responseType: 'code'
-  // To explicitly disable PKCE, set: disablePKCE: true
+  // PKCE is enabled by default for response_type=code
+  // S256 is the default code challenge method
 };
