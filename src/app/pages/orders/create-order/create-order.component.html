@@ -1,1 +1,153 @@
-<p>create-order works!</p>
+<div class="create-order-container">
+  <div class="header">
+    <h1>Create New Order</h1>
+  </div>
+
+  <!-- Success Message -->
+  @if (success()) {
+    <div class="alert alert-success">
+      <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+      </svg>
+      Order created successfully! Redirecting...
+    </div>
+  }
+
+  <!-- Error Message -->
+  @if (error()) {
+    <div class="alert alert-error">
+      <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+        <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+      </svg>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Order Form -->
+  <form [formGroup]="orderForm" (ngSubmit)="onSubmit()" class="order-form">
+    <div class="form-card">
+      <div class="form-card-header">
+        <h2>Order Information</h2>
+      </div>
+
+      <div class="form-card-body">
+        <!-- User ID Field -->
+        <div class="form-group">
+          <label for="userId" class="form-label">
+            User ID <span class="required">*</span>
+          </label>
+          <input
+            type="number"
+            id="userId"
+            formControlName="userId"
+            class="form-input"
+            placeholder="Enter user ID"
+            min="1"
+            [class.error]="orderForm.get('userId')?.invalid && orderForm.get('userId')?.touched">
+          @if (orderForm.get('userId')?.invalid && orderForm.get('userId')?.touched) {
+            <span class="error-message">User ID is required and must be a positive number</span>
+          }
+        </div>
+
+        <!-- Products Section -->
+        <div class="form-group">
+          <label class="form-label">
+            Products <span class="required">*</span>
+          </label>
+
+          <div class="products-section">
+            @if (productIds.length === 0) {
+              <div class="no-products">
+                <p>No products added yet. Click the button below to add products.</p>
+              </div>
+            }
+
+            @for (control of productIds.controls; track $index) {
+              <div class="product-row">
+                <div class="product-select-wrapper">
+                  <select
+                    [formControl]="$any(control)"
+                    class="form-select"
+                    [class.error]="control.invalid && control.touched">
+                    <option value="">Select a product</option>
+                    @for (product of availableProducts(); track product.id) {
+                      <option [value]="product.id">
+                        {{ product.name }} - {{ formatCurrency(product.price) }}
+                        @if (product.stockQuantity !== undefined) {
+                          ({{ product.stockQuantity }} in stock)
+                        }
+                      </option>
+                    }
+                  </select>
+                  @if (control.invalid && control.touched) {
+                    <span class="error-message">Please select a product</span>
+                  }
+                </div>
+
+                <button
+                  type="button"
+                  (click)="removeProduct($index)"
+                  class="btn btn-remove"
+                  title="Remove product">
+                  <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                  </svg>
+                </button>
+              </div>
+            }
+
+            <button
+              type="button"
+              (click)="addProduct()"
+              class="btn btn-add"
+              [disabled]="isLoading()">
+              <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+              </svg>
+              Add Product
+            </button>
+          </div>
+
+          @if (productIds.length === 0 && orderForm.get('productIds')?.touched) {
+            <span class="error-message">At least one product is required</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button
+        type="button"
+        (click)="cancel()"
+        class="btn btn-secondary"
+        [disabled]="isSubmitting()">
+        Cancel
+      </button>
+
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="isSubmitting() || isLoading()">
+        @if (isSubmitting()) {
+          <span class="spinner-small"></span>
+          Creating...
+        } @else {
+          <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+          </svg>
+          Create Order
+        }
+      </button>
+    </div>
+  </form>
+
+  <!-- Loading Products -->
+  @if (isLoading()) {
+    <div class="loading-overlay">
+      <div class="spinner"></div>
+      <p>Loading products...</p>
+    </div>
+  }
+</div>

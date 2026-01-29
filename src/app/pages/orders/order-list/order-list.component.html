@@ -1,1 +1,169 @@
-<p>order-list works!</p>
+<div class="order-list-container">
+  <div class="header">
+    <h1>Order Management</h1>
+    <a routerLink="/orders/create" class="btn btn-primary">
+      <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+      </svg>
+      Create Order
+    </a>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <div class="filter-group">
+      <label for="status-filter">Status:</label>
+      <select
+        id="status-filter"
+        [(ngModel)]="selectedStatus"
+        (ngModelChange)="onStatusFilterChange()"
+        class="form-select">
+        @for (status of statuses; track status) {
+          <option [value]="status">{{ status }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="user-search">User ID:</label>
+      <input
+        type="text"
+        id="user-search"
+        [(ngModel)]="searchUserId"
+        (keyup.enter)="onUserIdSearch()"
+        placeholder="Search by User ID"
+        class="form-input">
+      <button (click)="onUserIdSearch()" class="btn btn-secondary">Search</button>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  @if (error()) {
+    <div class="alert alert-error">
+      <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+        <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+      </svg>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading orders...</p>
+    </div>
+  }
+
+  <!-- Orders Table -->
+  @if (!isLoading() && hasOrders()) {
+    <div class="table-container">
+      <table class="orders-table">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>User ID</th>
+            <th>Product Count</th>
+            <th>Total Amount</th>
+            <th>Status</th>
+            <th>Created At</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (order of orders(); track order.id) {
+            <tr>
+              <td>
+                <a [routerLink]="['/orders', order.id]" class="order-link">
+                  #{{ order.id }}
+                </a>
+              </td>
+              <td>{{ order.userId }}</td>
+              <td>{{ order.productIds.length || 0 }}</td>
+              <td class="amount">{{ formatCurrency(order.totalAmount) }}</td>
+              <td>
+                <span [class]="'status-badge ' + getStatusClass(order.status)">
+                  {{ order.status }}
+                </span>
+              </td>
+              <td>{{ formatDate(order.createdAt) }}</td>
+              <td class="actions">
+                <div class="action-buttons">
+                  <select
+                    [value]="order.status"
+                    (change)="updateOrderStatus(order.id!, $any($event.target).value)"
+                    class="status-select">
+                    <option value="PENDING">PENDING</option>
+                    <option value="PROCESSING">PROCESSING</option>
+                    <option value="SHIPPED">SHIPPED</option>
+                    <option value="DELIVERED">DELIVERED</option>
+                    <option value="CANCELLED">CANCELLED</option>
+                  </select>
+
+                  <button
+                    (click)="deleteOrder(order.id!)"
+                    class="btn btn-danger btn-sm"
+                    title="Delete Order">
+                    <svg class="icon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                      <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <div class="pagination-info">
+        Showing {{ currentPage() * pageSize() + 1 }} to
+        {{ Math.min((currentPage() + 1) * pageSize(), totalElements()) }} of
+        {{ totalElements() }} orders
+      </div>
+
+      <div class="pagination-controls">
+        <button
+          (click)="previousPage()"
+          [disabled]="!hasPreviousPage()"
+          class="btn btn-secondary btn-sm">
+          Previous
+        </button>
+
+        <div class="page-numbers">
+          @for (page of [].constructor(totalPages()); track $index) {
+            <button
+              (click)="goToPage($index)"
+              [class.active]="currentPage() === $index"
+              class="btn btn-page">
+              {{ $index + 1 }}
+            </button>
+          }
+        </div>
+
+        <button
+          (click)="nextPage()"
+          [disabled]="!hasNextPage()"
+          class="btn btn-secondary btn-sm">
+          Next
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading() && !hasOrders()) {
+    <div class="empty-state">
+      <svg class="empty-icon" width="64" height="64" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+      </svg>
+      <h2>No Orders Found</h2>
+      <p>There are no orders matching your filters.</p>
+      <a routerLink="/orders/create" class="btn btn-primary">Create First Order</a>
+    </div>
+  }
+</div>

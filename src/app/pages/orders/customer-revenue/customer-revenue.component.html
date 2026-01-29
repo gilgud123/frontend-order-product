@@ -1,1 +1,145 @@
-<p>customer-revenue works!</p>
+<div class="customer-revenue-container">
+  <div class="header">
+    <h1>Customer Revenue Analytics</h1>
+    <a routerLink="/orders" class="btn btn-secondary">
+      <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+      </svg>
+      Back to Orders
+    </a>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-card">
+    <div class="search-header">
+      <h2>Search Customer Revenue</h2>
+    </div>
+    <div class="search-body">
+      <div class="search-group">
+        <label for="customer-search">Customer ID:</label>
+        <input
+          type="text"
+          id="customer-search"
+          [(ngModel)]="searchCustomerId"
+          (keyup.enter)="searchRevenue()"
+          placeholder="Enter customer ID"
+          class="form-input">
+        <button (click)="searchRevenue()" class="btn btn-primary">
+          <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+          </svg>
+          Search
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  @if (error()) {
+    <div class="alert alert-error">
+      <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+        <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+      </svg>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading revenue data...</p>
+    </div>
+  }
+
+  <!-- Revenue Data -->
+  @if (!isLoading() && hasData()) {
+    <!-- Summary Card -->
+    <div class="summary-card">
+      <div class="summary-item">
+        <label>Customer ID</label>
+        <span class="value">{{ filteredData()[0]?.customerId }}</span>
+      </div>
+      <div class="summary-item">
+        <label>Total Revenue (All Years)</label>
+        <span class="value amount">{{ formatCurrency(totalRevenue()) }}</span>
+      </div>
+      <div class="summary-item">
+        <label>Years with Orders</label>
+        <span class="value">{{ filteredData().length }}</span>
+      </div>
+    </div>
+
+    <!-- Revenue by Year -->
+    <div class="revenue-grid">
+      @for (revenue of filteredData(); track revenue.year) {
+        <div class="revenue-card" [style.border-left-color]="getYearColor($index)">
+          <div class="revenue-year">{{ revenue.year }}</div>
+          <div class="revenue-amount">{{ formatCurrency(revenue.totalRevenue) }}</div>
+          <div class="revenue-bar-container">
+            <div
+              class="revenue-bar"
+              [style.width.%]="(revenue.totalRevenue / totalRevenue()) * 100"
+              [style.background-color]="getYearColor($index)">
+            </div>
+          </div>
+          <div class="revenue-percentage">
+            {{ ((revenue.totalRevenue / totalRevenue()) * 100).toFixed(1) }}% of total
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Detailed Table -->
+    <div class="table-card">
+      <div class="table-header">
+        <h3>Revenue Breakdown</h3>
+      </div>
+      <div class="table-container">
+        <table class="revenue-table">
+          <thead>
+            <tr>
+              <th>Year</th>
+              <th>Total Revenue</th>
+              <th>Percentage</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (revenue of filteredData(); track revenue.year) {
+              <tr>
+                <td class="year-cell">
+                  <span
+                    class="year-badge"
+                    [style.background-color]="getYearColor($index)">
+                    {{ revenue.year }}
+                  </span>
+                </td>
+                <td class="amount-cell">{{ formatCurrency(revenue.totalRevenue) }}</td>
+                <td class="percentage-cell">
+                  {{ ((revenue.totalRevenue / totalRevenue()) * 100).toFixed(2) }}%
+                </td>
+              </tr>
+            }
+            <tr class="total-row">
+              <td><strong>Total</strong></td>
+              <td class="amount-cell"><strong>{{ formatCurrency(totalRevenue()) }}</strong></td>
+              <td class="percentage-cell"><strong>100.00%</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading() && !hasData() && !error()) {
+    <div class="empty-state">
+      <svg class="empty-icon" width="64" height="64" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M4 10.781c.148 1.667 1.513 2.85 3.591 3.003V15h1.043v-1.216c2.27-.179 3.678-1.438 3.678-3.3 0-1.59-.947-2.51-2.956-3.028l-.722-.187V3.467c1.122.11 1.879.714 2.07 1.616h1.47c-.166-1.6-1.54-2.748-3.54-2.875V1H7.591v1.233c-1.939.23-3.27 1.472-3.27 3.156 0 1.454.966 2.483 2.661 2.917l.61.162v4.031c-1.149-.17-1.94-.8-2.131-1.718H4zm3.391-3.836c-1.043-.263-1.6-.825-1.6-1.616 0-.944.704-1.641 1.8-1.828v3.495l-.2-.05zm1.591 1.872c1.287.323 1.852.859 1.852 1.769 0 1.097-.826 1.828-2.2 1.939V8.73l.348.086z"/>
+      </svg>
+      <h2>Search for Customer Revenue</h2>
+      <p>Enter a customer ID above to view their revenue analytics by year.</p>
+    </div>
+  }
+</div>
