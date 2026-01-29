@@ -1,1 +1,9 @@
-<app-loading-spinner [isLoading]="isLoading" message="Loading data..."></app-loading-spinner>
+@if (isLoading()) {
+  <div class="spinner-container">
+    <div class="spinner" [style.width.px]="size()" [style.height.px]="size()"></div>
+    @if (message()) {
+      <p class="spinner-message">{{ message() }}</p>
+    }
+  </div>
+}
+

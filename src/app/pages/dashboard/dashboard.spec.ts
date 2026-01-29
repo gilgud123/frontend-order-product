@@ -1,14 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DashboardComponent } from './dashboard.component';
-import { ProductService } from '../../../services';
-import { OrderService, OrderStatistics } from '../../../services';
-import { UserService } from '../../../services';
-import { AuthService } from '../../../auth';
+import { ProductService } from '../../services';
+import { OrderService, OrderStatistics } from '../../services';
+import { UserService } from '../../services';
+import { AuthService } from '../../auth';
 import { of, throwError } from 'rxjs';
-import { PaginatedResponse } from '../../../shared';
-import { ProductDTO } from '../../../models/product.model';
-import { OrderDTO } from '../../../models/order.model';
-import { UserDTO } from '../../../models/user.model';
+import { PaginatedResponse } from '../../shared';
+import { ProductDTO } from '../../models/product.model';
+import { OrderDTO } from '../../models/order.model';
+import { UserDTO } from '../../models/user.model';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;

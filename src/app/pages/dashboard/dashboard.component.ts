@@ -1,9 +1,9 @@
 import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ProductService } from '../../../services';
-import { OrderService, OrderStatistics } from '../../../services';
-import { UserService } from '../../../services';
-import { AuthService } from '../../../auth';
+import { ProductService } from '../../services';
+import { OrderService, OrderStatistics } from '../../services';
+import { UserService } from '../../services';
+import { AuthService } from '../../auth';
 
 interface DashboardStats {
   totalProducts: number;

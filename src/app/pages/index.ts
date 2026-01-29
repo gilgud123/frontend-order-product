@@ -19,7 +19,7 @@ export * from './orders/my-orders/my-orders.component';
 export * from './orders/customer-revenue/customer-revenue.component';
 
 // Dashboard
-export * from './dashboard/dashboard/dashboard.component';
+export * from './dashboard/dashboard.component';
 
 // Utility pages
 export * from './home/home.component';
