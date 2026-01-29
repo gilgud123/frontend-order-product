@@ -1,64 +1,142 @@
 <div class="product-detail-container">
-  <app-loading-spinner [isLoading]="isLoading"></app-loading-spinner>
+  <!-- Header -->
+  <div class="header">
+    <button (click)="goBack()" class="btn btn-back">
+      <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+      </svg>
+      Back to Products
+    </button>
+  </div>
 
-  @if (error) {
-    <div class="error-message">
-      {{ error }}
+  <!-- Error Message -->
+  @if (error()) {
+    <div class="alert alert-error">
+      <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+        <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+      </svg>
+      {{ error() }}
     </div>
   }
 
-  @if (product && !isLoading) {
-    <div class="product-detail">
-      <div class="header">
-        <h1>{{ product.name }}</h1>
-        @if (isAdmin) {
-          <div class="actions">
-            <a [routerLink]="['/products', product.id, 'edit']" class="btn btn-primary">Edit</a>
-            <button (click)="deleteProduct()" class="btn btn-danger">Delete</button>
-          </div>
-        }
-      </div>
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading product details...</p>
+    </div>
+  }
 
-      <div class="product-info">
-        <div class="info-row">
-          <label>Description:</label>
-          <p>{{ product.description || 'No description available' }}</p>
+  <!-- Product Details -->
+  @if (!isLoading() && hasProduct()) {
+    <div class="product-detail-content">
+      <div class="product-main">
+        <!-- Product Image -->
+        <div class="product-image-section">
+          <div class="product-image-large">
+            <svg width="100%" height="100%" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+              <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13zm13 1a.5.5 0 0 1 .5.5v6l-3.775-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12v.54A.505.505 0 0 1 1 12.5v-9a.5.5 0 0 1 .5-.5h13z"/>
+            </svg>
+          </div>
+          @if (product()!.category) {
+            <div class="category-badge">
+              {{ product()!.category }}
+            </div>
+          }
         </div>
 
-        <div class="info-row">
-          <label>Price:</label>
-          <p class="price">${{ product.price | number:'1.2-2' }}</p>
+        <!-- Product Info -->
+        <div class="product-info-section">
+          <h1 class="product-title">{{ product()!.name }}</h1>
+
+          <div class="price-stock-section">
+            <div class="price-tag">{{ formatCurrency(product()!.price) }}</div>
+            <div [class]="'stock-badge ' + stockClass()">
+              {{ stockLabel() }}
+              @if (product()!.stockQuantity !== undefined) {
+                <span class="stock-count">({{ product()!.stockQuantity }} units)</span>
+              }
+            </div>
+          </div>
+
+          @if (product()!.description) {
+            <div class="product-description">
+              <h2>Description</h2>
+              <p>{{ product()!.description }}</p>
+            </div>
+          }
+
+          <div class="product-metadata">
+            <h2>Product Information</h2>
+            <dl class="metadata-list">
+              @if (product()!.id) {
+                <div class="metadata-item">
+                  <dt>Product ID</dt>
+                  <dd>#{{ product()!.id }}</dd>
+                </div>
+              }
+              @if (product()!.category) {
+                <div class="metadata-item">
+                  <dt>Category</dt>
+                  <dd>{{ product()!.category }}</dd>
+                </div>
+              }
+              <div class="metadata-item">
+                <dt>Price</dt>
+                <dd>{{ formatCurrency(product()!.price) }}</dd>
+              </div>
+              <div class="metadata-item">
+                <dt>Stock Quantity</dt>
+                <dd>{{ product()!.stockQuantity || 0 }} units</dd>
+              </div>
+              @if (product()!.createdAt) {
+                <div class="metadata-item">
+                  <dt>Date Added</dt>
+                  <dd>{{ formatDate(product()!.createdAt) }}</dd>
+                </div>
+              }
+              @if (product()!.updatedAt && product()!.updatedAt !== product()!.createdAt) {
+                <div class="metadata-item">
+                  <dt>Last Updated</dt>
+                  <dd>{{ formatDate(product()!.updatedAt) }}</dd>
+                </div>
+              }
+            </dl>
+          </div>
+
+          <!-- Actions -->
+          <div class="product-actions">
+            @if (isAdmin()) {
+              <a
+                [routerLink]="['/products', product()!.id, 'edit']"
+                class="btn btn-primary">
+                <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                </svg>
+                Edit Product
+              </a>
+
+              <button
+                (click)="deleteProduct()"
+                class="btn btn-danger">
+                <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                  <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                </svg>
+                Delete Product
+              </button>
+            }
+
+            <a routerLink="/products" class="btn btn-secondary">
+              <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+              </svg>
+              Browse All Products
+            </a>
+          </div>
         </div>
-
-        <div class="info-row">
-          <label>Stock Quantity:</label>
-          <p [class.low-stock]="product.stockQuantity < 10">{{ product.stockQuantity }}</p>
-        </div>
-
-        @if (product.category) {
-          <div class="info-row">
-            <label>Category:</label>
-            <p>{{ product.category }}</p>
-          </div>
-        }
-
-        @if (product.createdAt) {
-          <div class="info-row">
-            <label>Created:</label>
-            <p>{{ product.createdAt | date:'medium' }}</p>
-          </div>
-        }
-
-        @if (product.updatedAt) {
-          <div class="info-row">
-            <label>Last Updated:</label>
-            <p>{{ product.updatedAt | date:'medium' }}</p>
-          </div>
-        }
-      </div>
-
-      <div class="back-link">
-        <a routerLink="/products" class="btn btn-secondary">Back to Products</a>
       </div>
     </div>
   }

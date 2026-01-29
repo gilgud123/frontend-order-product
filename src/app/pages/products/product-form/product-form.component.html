@@ -1,93 +1,211 @@
 <div class="product-form-container">
-  <h1>{{ isEditMode ? 'Edit Product' : 'Create New Product' }}</h1>
+  <div class="header">
+    <h1>{{ formTitle() }}</h1>
+  </div>
 
-  @if (error) {
-    <div class="error-message">
-      {{ error }}
+  <!-- Success Message -->
+  @if (success()) {
+    <div class="alert alert-success">
+      <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+      </svg>
+      Product {{ isEditMode() ? 'updated' : 'created' }} successfully! Redirecting...
     </div>
   }
 
-  <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
-    <div class="form-group">
-      <label for="name">Product Name *</label>
-      <input
-        id="name"
-        type="text"
-        formControlName="name"
-        class="form-control"
-        [class.is-invalid]="isFieldInvalid('name')"
-      />
-      @if (isFieldInvalid('name')) {
-        <div class="error-text">
-          {{ getFieldError('name') }}
+  <!-- Error Message -->
+  @if (error()) {
+    <div class="alert alert-error">
+      <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+        <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+      </svg>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading product data...</p>
+    </div>
+  }
+
+  <!-- Product Form -->
+  @if (!isLoading()) {
+    <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form">
+      <div class="form-card">
+        <div class="form-card-header">
+          <h2>Product Details</h2>
+          <p>Enter the product information below</p>
         </div>
-      }
-    </div>
 
-    <div class="form-group">
-      <label for="description">Description</label>
-      <textarea
-        id="description"
-        formControlName="description"
-        class="form-control"
-        rows="4"
-      ></textarea>
-    </div>
-
-    <div class="form-row">
-      <div class="form-group">
-        <label for="price">Price *</label>
-        <input
-          id="price"
-          type="number"
-          formControlName="price"
-          class="form-control"
-          step="0.01"
-          [class.is-invalid]="isFieldInvalid('price')"
-        />
-        @if (isFieldInvalid('price')) {
-          <div class="error-text">
-            {{ getFieldError('price') }}
+        <div class="form-card-body">
+          <!-- Product Name -->
+          <div class="form-group">
+            <label for="name" class="form-label">
+              Product Name <span class="required">*</span>
+            </label>
+            <input
+              type="text"
+              id="name"
+              formControlName="name"
+              class="form-input"
+              placeholder="Enter product name"
+              [class.error]="isFieldInvalid('name')">
+            @if (isFieldInvalid('name')) {
+              <span class="error-message">{{ getFieldError('name') }}</span>
+            }
+            <small class="field-hint">Minimum 3 characters, maximum 100 characters</small>
           </div>
-        }
+
+          <!-- Description -->
+          <div class="form-group">
+            <label for="description" class="form-label">
+              Description
+            </label>
+            <textarea
+              id="description"
+              formControlName="description"
+              class="form-textarea"
+              rows="4"
+              placeholder="Enter product description"
+              [class.error]="isFieldInvalid('description')"></textarea>
+            @if (isFieldInvalid('description')) {
+              <span class="error-message">{{ getFieldError('description') }}</span>
+            }
+            <small class="field-hint">Optional. Maximum 500 characters</small>
+          </div>
+
+          <!-- Price and Stock Row -->
+          <div class="form-row">
+            <!-- Price -->
+            <div class="form-group">
+              <label for="price" class="form-label">
+                Price <span class="required">*</span>
+              </label>
+              <div class="input-with-icon">
+                <span class="input-icon">$</span>
+                <input
+                  type="number"
+                  id="price"
+                  formControlName="price"
+                  class="form-input with-icon"
+                  placeholder="0.00"
+                  min="0"
+                  step="0.01"
+                  [class.error]="isFieldInvalid('price')">
+              </div>
+              @if (isFieldInvalid('price')) {
+                <span class="error-message">{{ getFieldError('price') }}</span>
+              }
+              <small class="field-hint">Must be greater than 0</small>
+            </div>
+
+            <!-- Stock Quantity -->
+            <div class="form-group">
+              <label for="stockQuantity" class="form-label">
+                Stock Quantity <span class="required">*</span>
+              </label>
+              <input
+                type="number"
+                id="stockQuantity"
+                formControlName="stockQuantity"
+                class="form-input"
+                placeholder="0"
+                min="0"
+                step="1"
+                [class.error]="isFieldInvalid('stockQuantity')">
+              @if (isFieldInvalid('stockQuantity')) {
+                <span class="error-message">{{ getFieldError('stockQuantity') }}</span>
+              }
+              <small class="field-hint">Number of units available</small>
+            </div>
+          </div>
+
+          <!-- Category -->
+          <div class="form-group">
+            <label for="category" class="form-label">
+              Category <span class="required">*</span>
+            </label>
+            <select
+              id="category"
+              formControlName="category"
+              class="form-select"
+              [class.error]="isFieldInvalid('category')">
+              <option value="">Select a category</option>
+              @for (category of categories; track category) {
+                <option [value]="category">{{ category }}</option>
+              }
+            </select>
+            @if (isFieldInvalid('category')) {
+              <span class="error-message">{{ getFieldError('category') }}</span>
+            }
+          </div>
+
+          <!-- Form Summary -->
+          <div class="form-summary">
+            <div class="summary-item">
+              <span class="summary-label">Product Name:</span>
+              <span class="summary-value">{{ f['name'].value || 'Not set' }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Price:</span>
+              <span class="summary-value">
+                @if (f['price'].value > 0) {
+                  ${{ f['price'].value }}
+                } @else {
+                  Not set
+                }
+              </span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Stock:</span>
+              <span class="summary-value">{{ f['stockQuantity'].value || 0 }} units</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Category:</span>
+              <span class="summary-value">{{ f['category'].value || 'Not selected' }}</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="form-group">
-        <label for="stockQuantity">Stock Quantity *</label>
-        <input
-          id="stockQuantity"
-          type="number"
-          formControlName="stockQuantity"
-          class="form-control"
-          [class.is-invalid]="isFieldInvalid('stockQuantity')"
-        />
-        @if (isFieldInvalid('stockQuantity')) {
-          <div class="error-text">
-            {{ getFieldError('stockQuantity') }}
-          </div>
-        }
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button
+          type="button"
+          (click)="cancel()"
+          class="btn btn-secondary"
+          [disabled]="isSubmitting()">
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="isSubmitting() || productForm.invalid">
+          @if (isSubmitting()) {
+            <span class="spinner-small"></span>
+            {{ isEditMode() ? 'Updating...' : 'Creating...' }}
+          } @else {
+            <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"/>
+            </svg>
+            {{ submitButtonText() }}
+          }
+        </button>
       </div>
-    </div>
 
-    <div class="form-group">
-      <label for="category">Category</label>
-      <input
-        id="category"
-        type="text"
-        formControlName="category"
-        class="form-control"
-      />
-    </div>
-
-    <div class="form-actions">
-      <button
-        type="submit"
-        class="btn btn-primary"
-        [disabled]="isSubmitting || productForm.invalid"
-      >
-        {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Update' : 'Create') }}
-      </button>
-      <a routerLink="/products" class="btn btn-secondary">Cancel</a>
-    </div>
-  </form>
+      <!-- Required Fields Note -->
+      <div class="form-note">
+        <svg class="icon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+          <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+        </svg>
+        <span>Fields marked with <span class="required">*</span> are required</span>
+      </div>
+    </form>
+  }
 </div>
