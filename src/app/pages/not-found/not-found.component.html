@@ -1,1 +1,46 @@
-<p>not-found works!</p>
+<div class="not-found-container">
+  <div class="not-found-content">
+    <div class="error-code">404</div>
+    <h1 class="error-title">Page Not Found</h1>
+    <p class="error-message">
+      Oops! The page you're looking for doesn't exist or has been moved.
+    </p>
+
+    <div class="countdown-info">
+      <p>Redirecting to home in <span class="countdown">{{ countdown() }}</span> seconds...</p>
+    </div>
+
+    <div class="action-buttons">
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="goHome()">
+        <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146z"/>
+        </svg>
+        Go to Home
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="goBack()">
+        <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+        </svg>
+        Go Back
+      </button>
+    </div>
+
+    <div class="helpful-links">
+      <p>You might find these helpful:</p>
+      <ul>
+        <li><a routerLink="/">Home</a></li>
+        <li><a routerLink="/products">Products</a></li>
+        <li><a routerLink="/orders">Orders</a></li>
+        <li><a routerLink="/dashboard">Dashboard</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+

@@ -1,1 +1,89 @@
-<p>home works!</p>
+<div class="home-container">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1 class="hero-title">Welcome to Order & Product Management</h1>
+      <p class="hero-subtitle">
+        Streamline your business operations with our comprehensive platform for managing products, orders, and customers.
+      </p>
+      <div class="hero-actions">
+        <button (click)="getStarted()" class="btn btn-primary">
+          @if (isAuthenticated()) {
+            Go to Dashboard
+          } @else {
+            Get Started
+          }
+        </button>
+        @if (!isAuthenticated()) {
+          <button (click)="login()" class="btn btn-secondary">
+            Sign In
+          </button>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features">
+    <h2 class="section-title">Key Features</h2>
+    <div class="features-grid">
+      @for (feature of visibleFeatures(); track feature.title) {
+        <div class="feature-card" [class.locked]="feature.requiresAuth && !isAuthenticated()">
+          <div class="feature-icon">{{ feature.icon }}</div>
+          <h3 class="feature-title">{{ feature.title }}</h3>
+          <p class="feature-description">{{ feature.description }}</p>
+          @if (feature.requiresAuth && !isAuthenticated()) {
+            <span class="feature-lock">? Login Required</span>
+          } @else {
+            <a [routerLink]="feature.route" class="feature-link">
+              Explore ?
+            </a>
+          }
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Benefits Section -->
+  <section class="benefits">
+    <h2 class="section-title">Why Choose Our Platform?</h2>
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <div class="benefit-icon">?</div>
+        <h3>Fast & Efficient</h3>
+        <p>Optimized performance for seamless user experience</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">?</div>
+        <h3>Secure</h3>
+        <p>Enterprise-grade security with OAuth2 authentication</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">?</div>
+        <h3>Responsive</h3>
+        <p>Works perfectly on all devices and screen sizes</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">?</div>
+        <h3>Intuitive</h3>
+        <p>User-friendly interface designed for productivity</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta">
+    <div class="cta-content">
+      <h2>Ready to Get Started?</h2>
+      <p>Join us today and experience the future of order and product management.</p>
+      <button (click)="getStarted()" class="btn btn-primary btn-large">
+        @if (isAuthenticated()) {
+          View Dashboard
+        } @else {
+          Start Now
+        }
+      </button>
+    </div>
+  </section>
+</div>
+
