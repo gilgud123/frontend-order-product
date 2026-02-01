@@ -6,4 +6,5 @@ export * from './interceptors/auth-interceptor';
 export * from './interceptors/error-interceptor';
 export * from './guards/auth-guard';
 export * from './guards/admin-guard';
+export * from './guards/role-guard';
 export * from './config/environment.type';

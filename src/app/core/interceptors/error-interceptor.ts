@@ -9,7 +9,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      let errorMessage = 'An error occurred';
+      let errorMessage: string;
 
       if (error.error instanceof ErrorEvent) {
         // Client-side error
