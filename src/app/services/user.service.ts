@@ -1,9 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { UserDTO } from '../models/user.model';
-import { PaginatedResponse } from '../shared/models/pagination.model';
+import { PaginatedResponse } from '../shared';
 
 @Injectable({
   providedIn: 'root'
@@ -146,6 +146,6 @@ export class UserService {
 
   private handleError(error: any): Observable<never> {
     console.error('UserService Error:', error);
-    throw error;
+    return throwError(() => error);
   }
 }

@@ -29,3 +29,4 @@ export * from './accordion/accordion.component';
 export * from './dropdown-menu/dropdown-menu.component';
 export * from './icon/icon.component';
 export * from './progress-bar/progress-bar.component';
+export * from './todo-list/todo-list.component';
