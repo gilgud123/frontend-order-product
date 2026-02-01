@@ -16,7 +16,7 @@ export class UserService {
    * Get all users with pagination (admin only)
    * GET /api/users?page={page}&size={size}
    */
-  getAll(page: number = 0, size: number = 10): Observable<PaginatedResponse<UserDTO>> {
+  getAll(page = 0, size = 10): Observable<PaginatedResponse<UserDTO>> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
@@ -38,7 +38,7 @@ export class UserService {
    * Search users by query string (admin only)
    * GET /api/users/search?query={query}&page={page}&size={size}
    */
-  search(query: string, page: number = 0, size: number = 10): Observable<PaginatedResponse<UserDTO>> {
+  search(query: string, page = 0, size = 10): Observable<PaginatedResponse<UserDTO>> {
     const params = new HttpParams()
       .set('query', query)
       .set('page', page.toString())
@@ -135,7 +135,7 @@ export class UserService {
    * Get users by role (admin only)
    * GET /api/users/role/{role}?page={page}&size={size}
    */
-  getByRole(role: string, page: number = 0, size: number = 10): Observable<PaginatedResponse<UserDTO>> {
+  getByRole(role: string, page = 0, size = 10): Observable<PaginatedResponse<UserDTO>> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());

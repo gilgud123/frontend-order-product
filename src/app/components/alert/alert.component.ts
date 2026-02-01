@@ -12,8 +12,8 @@ type AlertType = 'success' | 'info' | 'warning' | 'error';
 })
 export class AlertComponent {
   @Input() type: AlertType = 'info';
-  @Input() dismissible: boolean = false;
-  @Input() message: string = '';
+  @Input() dismissible = false;
+  @Input() message = '';
   @Output() dismissed = new EventEmitter<void>();
 
   isVisible = true;

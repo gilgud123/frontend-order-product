@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { Router } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { Location } from '@angular/common';
+import { provideZoneChangeDetection } from '@angular/core';
 import { NotFoundComponent } from './not-found.component';
 
 describe('NotFoundComponent', () => {
@@ -10,10 +11,6 @@ describe('NotFoundComponent', () => {
   let location: Location;
 
   beforeEach(async () => {
-    const mockRouter = {
-      navigate: jasmine.createSpy('navigate')
-    };
-    
     const mockLocation = {
       back: jasmine.createSpy('back')
     };
@@ -21,7 +18,8 @@ describe('NotFoundComponent', () => {
     await TestBed.configureTestingModule({
       imports: [NotFoundComponent],
       providers: [
-        { provide: Router, useValue: mockRouter },
+        provideZoneChangeDetection({ eventCoalescing: true }),
+        provideRouter([]),
         { provide: Location, useValue: mockLocation }
       ]
     })
@@ -30,6 +28,7 @@ describe('NotFoundComponent', () => {
     fixture = TestBed.createComponent(NotFoundComponent);
     component = fixture.componentInstance;
     router = TestBed.inject(Router);
+    spyOn(router, 'navigate');
     location = TestBed.inject(Location);
   });
 
@@ -44,33 +43,33 @@ describe('NotFoundComponent', () => {
 
     it('should start countdown on init', fakeAsync(() => {
       fixture.detectChanges(); // triggers ngOnInit
-      
+
       expect(component.countdown()).toBe(10);
-      
+
       tick(1000);
       expect(component.countdown()).toBe(9);
-      
+
       tick(1000);
       expect(component.countdown()).toBe(8);
     }));
 
     it('should navigate to home when countdown reaches 0', fakeAsync(() => {
       fixture.detectChanges();
-      
+
       tick(10000); // Fast forward 10 seconds
-      
+
       expect(router.navigate).toHaveBeenCalledWith(['/']);
     }));
 
     it('should clear interval on destroy', fakeAsync(() => {
       fixture.detectChanges();
-      
+
       const initialCount = component.countdown();
-      
+
       fixture.destroy(); // triggers ngOnDestroy
-      
+
       tick(2000);
-      
+
       // Countdown should not have changed after destroy
       expect(component.countdown()).toBe(initialCount - 1); // -1 because one tick happened before destroy
     }));
@@ -118,7 +117,7 @@ describe('NotFoundComponent', () => {
     it('should update countdown in template', fakeAsync(() => {
       tick(1000);
       fixture.detectChanges();
-      
+
       const compiled = fixture.nativeElement;
       const countdown = compiled.querySelector('.countdown');
       expect(countdown?.textContent).toContain('9');
@@ -165,9 +164,9 @@ describe('NotFoundComponent', () => {
     it('should clean up interval on destroy', fakeAsync(() => {
       fixture.detectChanges();
       const spy = spyOn(window, 'clearInterval');
-      
+
       fixture.destroy();
-      
+
       expect(spy).toHaveBeenCalled();
     }));
   });

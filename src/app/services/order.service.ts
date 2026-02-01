@@ -17,7 +17,7 @@ export class OrderService {
    * Get all orders with pagination (admin only)
    * GET /api/orders?page={page}&size={size}
    */
-  getAll(page: number = 0, size: number = 10): Observable<PaginatedResponse<OrderDTO>> {
+  getAll(page = 0, size = 10): Observable<PaginatedResponse<OrderDTO>> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
@@ -39,7 +39,7 @@ export class OrderService {
    * Get orders by user ID
    * GET /api/orders/user/{userId}?page={page}&size={size}
    */
-  getByUserId(userId: number, page: number = 0, size: number = 10): Observable<PaginatedResponse<OrderDTO>> {
+  getByUserId(userId: number, page = 0, size = 10): Observable<PaginatedResponse<OrderDTO>> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
@@ -52,7 +52,7 @@ export class OrderService {
    * Get current user's orders
    * GET /api/orders/my-orders?page={page}&size={size}
    */
-  getMyOrders(page: number = 0, size: number = 10): Observable<PaginatedResponse<OrderDTO>> {
+  getMyOrders(page = 0, size = 10): Observable<PaginatedResponse<OrderDTO>> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
@@ -65,7 +65,7 @@ export class OrderService {
    * Get orders by status
    * GET /api/orders/status?status={status}&page={page}&size={size}
    */
-  getByStatus(status: string, page: number = 0, size: number = 10): Observable<PaginatedResponse<OrderDTO>> {
+  getByStatus(status: string, page = 0, size = 10): Observable<PaginatedResponse<OrderDTO>> {
     const params = new HttpParams()
       .set('status', status)
       .set('page', page.toString())
@@ -82,8 +82,8 @@ export class OrderService {
   getByDateRange(
     startDate: string,
     endDate: string,
-    page: number = 0,
-    size: number = 10
+    page = 0,
+    size = 10
   ): Observable<PaginatedResponse<OrderDTO>> {
     const params = new HttpParams()
       .set('startDate', startDate)

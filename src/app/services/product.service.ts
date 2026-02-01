@@ -16,7 +16,7 @@ export class ProductService {
    * Get all products with pagination
    * GET /api/products?page={page}&size={size}
    */
-  getAll(page: number = 0, size: number = 10): Observable<PaginatedResponse<ProductDTO>> {
+  getAll(page = 0, size = 10): Observable<PaginatedResponse<ProductDTO>> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
@@ -38,7 +38,7 @@ export class ProductService {
    * Search products by query string
    * GET /api/products/search?query={query}&page={page}&size={size}
    */
-  search(query: string, page: number = 0, size: number = 10): Observable<PaginatedResponse<ProductDTO>> {
+  search(query: string, page = 0, size = 10): Observable<PaginatedResponse<ProductDTO>> {
     const params = new HttpParams()
       .set('query', query)
       .set('page', page.toString())
@@ -58,8 +58,8 @@ export class ProductService {
       minPrice?: number;
       maxPrice?: number;
     },
-    page: number = 0,
-    size: number = 10
+    page = 0,
+    size = 10
   ): Observable<PaginatedResponse<ProductDTO>> {
     let params = new HttpParams()
       .set('page', page.toString())
@@ -83,7 +83,7 @@ export class ProductService {
    * Get products by category
    * GET /api/products/category/{category}?page={page}&size={size}
    */
-  getByCategory(category: string, page: number = 0, size: number = 10): Observable<PaginatedResponse<ProductDTO>> {
+  getByCategory(category: string, page = 0, size = 10): Observable<PaginatedResponse<ProductDTO>> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
@@ -96,7 +96,7 @@ export class ProductService {
    * Get low stock products
    * GET /api/products/low-stock?threshold={threshold}
    */
-  getLowStock(threshold: number = 10): Observable<ProductDTO[]> {
+  getLowStock(threshold = 10): Observable<ProductDTO[]> {
     const params = new HttpParams().set('threshold', threshold.toString());
     return this.http.get<ProductDTO[]>(`${this.API_URL}/low-stock`, { params })
       .pipe(catchError(this.handleError));

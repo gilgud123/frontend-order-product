@@ -74,7 +74,7 @@ export interface Tab {
 })
 export class TabsComponent {
   @Input() tabs: Tab[] = [];
-  @Input() activeTabId: string = '';
+  @Input() activeTabId = '';
   @Output() tabChange = new EventEmitter<string>();
 
   selectTab(tabId: string): void {

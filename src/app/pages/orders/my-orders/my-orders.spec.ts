@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { provideZoneChangeDetection } from '@angular/core';
 import { MyOrdersComponent } from './my-orders.component';
 import { OrderService } from '../../../services/order.service';
 import { of, throwError } from 'rxjs';
@@ -31,6 +33,8 @@ describe('MyOrdersComponent', () => {
     await TestBed.configureTestingModule({
       imports: [MyOrdersComponent],
       providers: [
+        provideZoneChangeDetection({ eventCoalescing: true }),
+        provideRouter([]),
         { provide: OrderService, useValue: mockOrderService }
       ]
     }).compileComponents();

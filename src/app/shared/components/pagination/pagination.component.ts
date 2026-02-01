@@ -36,7 +36,7 @@ export class PaginationComponent {
 
     // Show ellipsis logic
     let start = Math.max(0, current - 4);
-    let end = Math.min(total, start + maxPages);
+    const end = Math.min(total, start + maxPages);
 
     if (end - start < maxPages) {
       start = Math.max(0, end - maxPages);

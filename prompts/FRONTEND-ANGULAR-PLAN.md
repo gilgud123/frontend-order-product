@@ -201,7 +201,7 @@ Notes: Use `number` for numeric values. If monetary precision is critical, consi
 --------------------------------------
 - Recommended Keycloak client settings (Admin Console):
   - Realm: `product-rest-api` (as in README)
-  - Client ID: `frontend-spa`
+  - Client ID: `frontend-opa`
   - Client protocol: `openid-connect`
   - Access Type: `public`
   - Standard Flow Enabled: ON (Authorization Code)
@@ -215,7 +215,7 @@ Notes: Use `number` for numeric values. If monetary precision is critical, consi
 export const authConfig: AuthConfig = {
   issuer: 'https://localhost:8081/realms/product-rest-api',
   redirectUri: window.location.origin,
-  clientId: 'frontend-spa',
+  clientId: 'frontend-opa',
   responseType: 'code',
   scope: 'openid profile email',
   showDebugInformation: true,
@@ -438,7 +438,7 @@ intercept(req: HttpRequest<any>, next: HttpHandler) {
 ```
 
 - Example Keycloak client minimal settings (Admin Console):
-  - Client ID: `frontend-spa`
+  - Client ID: `frontend-opa`
   - Access Type: `public`
   - Valid Redirect URIs: `http://localhost:4200/*`
   - Web Origins: `http://localhost:4200`

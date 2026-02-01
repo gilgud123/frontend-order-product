@@ -5,7 +5,10 @@
   "cli": {
     "warnings": {
       "versionMismatch": false
-    }
+    },
+    "schematicCollections": [
+      "angular-eslint"
+    ]
   },
   "projects": {
     "frontend-order-product": {
@@ -101,6 +104,15 @@
             ],
             "styles": [
               "src/styles.scss"
+            ]
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
             ]
           }
         }

@@ -4,7 +4,7 @@ export class StringUtils {
     return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
   }
 
-  static truncate(text: string, length: number, suffix: string = '...'): string {
+  static truncate(text: string, length: number, suffix = '...'): string {
     if (!text || text.length <= length) return text;
     return text.substring(0, length).trim() + suffix;
   }

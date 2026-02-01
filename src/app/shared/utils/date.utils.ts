@@ -1,5 +1,5 @@
 export class DateUtils {
-  static formatDate(date: Date | string, format: string = 'MM/DD/YYYY'): string {
+  static formatDate(date: Date | string, format = 'MM/DD/YYYY'): string {
     const d = typeof date === 'string' ? new Date(date) : date;
     if (isNaN(d.getTime())) return '';
 

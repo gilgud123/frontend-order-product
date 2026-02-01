@@ -55,8 +55,8 @@ import { CommonModule } from '@angular/common';
   `]
 })
 export class ProgressBarComponent {
-  @Input() value: number = 0;
-  @Input() label: string = '';
-  @Input() showLabel: boolean = true;
+  @Input() value = 0;
+  @Input() label = '';
+  @Input() showLabel = true;
   @Input() variant: 'primary' | 'success' | 'warning' | 'danger' = 'primary';
 }

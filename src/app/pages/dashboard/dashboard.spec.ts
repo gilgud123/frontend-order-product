@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { provideZoneChangeDetection } from '@angular/core';
 import { DashboardComponent } from './dashboard.component';
 import { ProductService } from '../../services';
 import { OrderService, OrderStatistics } from '../../services';
@@ -73,6 +75,8 @@ describe('DashboardComponent', () => {
     await TestBed.configureTestingModule({
       imports: [DashboardComponent],
       providers: [
+        provideZoneChangeDetection({ eventCoalescing: true }),
+        provideRouter([]),
         { provide: ProductService, useValue: mockProductService },
         { provide: OrderService, useValue: mockOrderService },
         { provide: UserService, useValue: mockUserService },
