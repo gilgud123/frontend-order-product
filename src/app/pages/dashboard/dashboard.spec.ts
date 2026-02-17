@@ -6,7 +6,7 @@ import { ProductService } from '../../services';
 import { OrderService, OrderStatistics } from '../../services';
 import { UserService } from '../../services';
 import { AuthService } from '../../auth';
-import { of, throwError } from 'rxjs';
+import { of, throwError, Observable } from 'rxjs';
 import { PaginatedResponse } from '../../shared';
 import { ProductDTO } from '../../models/product.model';
 import { OrderDTO } from '../../models/order.model';
@@ -215,6 +215,11 @@ describe('DashboardComponent', () => {
   });
 
   describe('User Profile', () => {
+    beforeEach(() => {
+      mockAuthService.hasRole.and.returnValue(false);
+      mockOrderService.getMyOrders.and.returnValue(of(mockOrdersResponse));
+    });
+
     it('should set userName from user profile', (done) => {
       fixture.detectChanges();
 
@@ -224,28 +229,58 @@ describe('DashboardComponent', () => {
       }, 50);
     });
 
-    it('should use preferred_username if name is not available', (done) => {
-      mockAuthService.user$ = of({ sub: 'test-sub', preferred_username: 'testuser' });
+    it('should use preferred_username if name is not available', async () => {
+      const newMockAuthService = jasmine.createSpyObj('AuthService', ['hasRole'], {
+        user$: of({ sub: 'test-sub', preferred_username: 'testuser' })
+      });
+      newMockAuthService.hasRole.and.returnValue(false);
+
+      await TestBed.resetTestingModule();
+      await TestBed.configureTestingModule({
+        imports: [DashboardComponent],
+        providers: [
+          provideZoneChangeDetection({ eventCoalescing: true }),
+          provideRouter([]),
+          { provide: ProductService, useValue: mockProductService },
+          { provide: OrderService, useValue: mockOrderService },
+          { provide: UserService, useValue: mockUserService },
+          { provide: AuthService, useValue: newMockAuthService }
+        ]
+      }).compileComponents();
+
       fixture = TestBed.createComponent(DashboardComponent);
       component = fixture.componentInstance;
       fixture.detectChanges();
 
-      setTimeout(() => {
-        expect(component.userName()).toBe('testuser');
-        done();
-      }, 50);
+      await new Promise(resolve => setTimeout(resolve, 50));
+      expect(component.userName()).toBe('testuser');
     });
 
-    it('should default to "User" if no name available', (done) => {
-      mockAuthService.user$ = of({ sub: 'test-sub' });
+    it('should default to "User" if no name available', async () => {
+      const newMockAuthService = jasmine.createSpyObj('AuthService', ['hasRole'], {
+        user$: of({ sub: 'test-sub' })
+      });
+      newMockAuthService.hasRole.and.returnValue(false);
+
+      await TestBed.resetTestingModule();
+      await TestBed.configureTestingModule({
+        imports: [DashboardComponent],
+        providers: [
+          provideZoneChangeDetection({ eventCoalescing: true }),
+          provideRouter([]),
+          { provide: ProductService, useValue: mockProductService },
+          { provide: OrderService, useValue: mockOrderService },
+          { provide: UserService, useValue: mockUserService },
+          { provide: AuthService, useValue: newMockAuthService }
+        ]
+      }).compileComponents();
+
       fixture = TestBed.createComponent(DashboardComponent);
       component = fixture.componentInstance;
       fixture.detectChanges();
 
-      setTimeout(() => {
-        expect(component.userName()).toBe('User');
-        done();
-      }, 50);
+      await new Promise(resolve => setTimeout(resolve, 50));
+      expect(component.userName()).toBe('User');
     });
   });
 
@@ -283,11 +318,25 @@ describe('DashboardComponent', () => {
       }, 100);
     });
 
-    it('should render loading state initially', () => {
-      component.isLoading.set(true);
-      fixture.detectChanges();
-      const compiled = fixture.nativeElement as HTMLElement;
-      expect(compiled.querySelector('.loading-container')).toBeTruthy();
+    it('should render loading state', (done) => {
+      // Create observable that never completes to keep loading state active
+      const delayedObservable = new Observable(() => {
+        // Never emit or complete, keeping isLoading true
+      });
+
+      mockOrderService.getMyOrders.and.returnValue(delayedObservable as any);
+
+      // Create fresh fixture
+      const loadingFixture = TestBed.createComponent(DashboardComponent);
+      loadingFixture.detectChanges();
+
+      // Check immediately - component should still be loading
+      const compiled = loadingFixture.nativeElement as HTMLElement;
+      const loadingContainer = compiled.querySelector('.loading-container');
+
+      expect(loadingContainer).toBeTruthy();
+      expect(loadingContainer?.textContent).toContain('Loading dashboard data');
+      done();
     });
 
     it('should render stats section after loading', (done) => {

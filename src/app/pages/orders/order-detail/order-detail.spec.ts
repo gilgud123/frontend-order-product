@@ -1,8 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderDetailComponent } from './order-detail.component';
-import { OrderService } from '../../../services/order.service';
-import { ProductService } from '../../../services/product.service';
+import { OrderService, ProductService } from '../../../services';
 import { AuthService } from '../../../auth';
 import { of, throwError } from 'rxjs';
 import { OrderDTO } from '../../../models/order.model';
@@ -53,7 +52,7 @@ describe('OrderDetailComponent', () => {
           useValue: {
             snapshot: {
               paramMap: {
-                get: (key: string) => '1'
+                get: (_key: string) => '1'
               }
             }
           }
@@ -99,7 +98,7 @@ describe('OrderDetailComponent', () => {
             useValue: {
               snapshot: {
                 paramMap: {
-                  get: (key: string) => null
+                  get: (_key: string) => null
                 }
               }
             }
