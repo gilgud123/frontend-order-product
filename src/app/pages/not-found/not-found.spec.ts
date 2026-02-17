@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick, flush } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { Location } from '@angular/common';
 import { provideZoneChangeDetection } from '@angular/core';
@@ -56,7 +56,13 @@ describe('NotFoundComponent', () => {
     it('should navigate to home when countdown reaches 0', fakeAsync(() => {
       fixture.detectChanges();
 
-      tick(10000); // Fast forward 10 seconds
+      // Tick 10 times (1 second each) to reach 0
+      for (let i = 0; i < 10; i++) {
+        tick(1000);
+      }
+
+      // Tick one more time to trigger the navigation when countdown is 0
+      tick(1000);
 
       expect(router.navigate).toHaveBeenCalledWith(['/']);
     }));
@@ -64,14 +70,18 @@ describe('NotFoundComponent', () => {
     it('should clear interval on destroy', fakeAsync(() => {
       fixture.detectChanges();
 
-      const initialCount = component.countdown();
+      // Let countdown tick once
+      tick(1000);
+      expect(component.countdown()).toBe(9);
 
-      fixture.destroy(); // triggers ngOnDestroy
+      // Destroy the component
+      fixture.destroy();
 
+      // Try to tick again
       tick(2000);
 
-      // Countdown should not have changed after destroy
-      expect(component.countdown()).toBe(initialCount - 1); // -1 because one tick happened before destroy
+      // Countdown should still be 9 (not changed after destroy)
+      expect(component.countdown()).toBe(9);
     }));
   });
 
@@ -92,38 +102,57 @@ describe('NotFoundComponent', () => {
   });
 
   describe('Template', () => {
-    beforeEach(() => {
-      fixture.detectChanges();
-    });
-
     it('should display 404 error code', () => {
+      fixture.detectChanges();
       const compiled = fixture.nativeElement;
       const errorCode = compiled.querySelector('.error-code');
       expect(errorCode?.textContent).toContain('404');
     });
 
     it('should display error title', () => {
+      fixture.detectChanges();
       const compiled = fixture.nativeElement;
       const title = compiled.querySelector('.error-title');
       expect(title?.textContent).toContain('Page Not Found');
     });
 
     it('should display countdown value', () => {
+      fixture.detectChanges();
       const compiled = fixture.nativeElement;
       const countdown = compiled.querySelector('.countdown');
       expect(countdown?.textContent).toContain('10');
     });
 
     it('should update countdown in template', fakeAsync(() => {
-      tick(1000);
-      fixture.detectChanges();
+      // Create a fresh fixture within fakeAsync context
+      const testFixture = TestBed.createComponent(NotFoundComponent);
+      const testComponent = testFixture.componentInstance;
+      const compiled = testFixture.nativeElement;
 
-      const compiled = fixture.nativeElement;
+      // Verify initial state
+      expect(testComponent.countdown()).toBe(10);
+
+      // Trigger ngOnInit to start countdown in fakeAsync context
+      testFixture.detectChanges();
+
+      // Tick 1 second to trigger countdown update
+      tick(1000);
+      testFixture.detectChanges();
+
+      // Component countdown should have decremented
+      expect(testComponent.countdown()).toBe(9);
+
+      // Template should reflect the change
       const countdown = compiled.querySelector('.countdown');
       expect(countdown?.textContent).toContain('9');
+
+      // Clean up any remaining timers
+      testFixture.destroy();
+      flush();
     }));
 
     it('should have "Go to Home" button', () => {
+      fixture.detectChanges();
       const compiled = fixture.nativeElement;
       const buttons = compiled.querySelectorAll('.btn-primary');
       expect(buttons.length).toBeGreaterThan(0);
@@ -131,6 +160,7 @@ describe('NotFoundComponent', () => {
     });
 
     it('should have "Go Back" button', () => {
+      fixture.detectChanges();
       const compiled = fixture.nativeElement;
       const buttons = compiled.querySelectorAll('.btn-secondary');
       expect(buttons.length).toBeGreaterThan(0);
@@ -138,6 +168,7 @@ describe('NotFoundComponent', () => {
     });
 
     it('should trigger goHome when home button is clicked', () => {
+      fixture.detectChanges();
       spyOn(component, 'goHome');
       const compiled = fixture.nativeElement;
       const homeButton = compiled.querySelector('.btn-primary');
@@ -146,6 +177,7 @@ describe('NotFoundComponent', () => {
     });
 
     it('should trigger goBack when back button is clicked', () => {
+      fixture.detectChanges();
       spyOn(component, 'goBack');
       const compiled = fixture.nativeElement;
       const backButton = compiled.querySelector('.btn-secondary');
@@ -154,6 +186,7 @@ describe('NotFoundComponent', () => {
     });
 
     it('should display helpful links', () => {
+      fixture.detectChanges();
       const compiled = fixture.nativeElement;
       const links = compiled.querySelectorAll('.helpful-links a');
       expect(links.length).toBeGreaterThan(0);

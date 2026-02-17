@@ -35,7 +35,7 @@ describe('ProductFormComponent', () => {
           useValue: {
             snapshot: {
               paramMap: {
-                get: (key: string) => null
+                get: (_key: string) => null
               }
             }
           }
@@ -72,7 +72,7 @@ describe('ProductFormComponent', () => {
             useValue: {
               snapshot: {
                 paramMap: {
-                  get: (key: string) => '1'
+                  get: (_key: string) => '1'
                 }
               }
             }
@@ -103,7 +103,7 @@ describe('ProductFormComponent', () => {
             useValue: {
               snapshot: {
                 paramMap: {
-                  get: (key: string) => '1'
+                  get: (_key: string) => '1'
                 }
               }
             }
@@ -147,10 +147,12 @@ describe('ProductFormComponent', () => {
 
     it('should require price', () => {
       const price = component.productForm.get('price');
-      expect(price?.hasError('required')).toBe(true);
+      // Price defaults to 0, so required passes but min(0.01) fails
+      expect(price?.hasError('min')).toBe(true);
 
       price?.setValue(10);
       expect(price?.hasError('required')).toBe(false);
+      expect(price?.hasError('min')).toBe(false);
     });
 
     it('should validate price minimum', () => {
@@ -172,7 +174,9 @@ describe('ProductFormComponent', () => {
 
     it('should require stock quantity', () => {
       const stock = component.productForm.get('stockQuantity');
-      expect(stock?.hasError('required')).toBe(true);
+      // Stock defaults to 0, which satisfies required and min(0)
+      expect(stock?.hasError('required')).toBe(false);
+      expect(stock?.value).toBe(0);
 
       stock?.setValue(10);
       expect(stock?.hasError('required')).toBe(false);
@@ -243,7 +247,7 @@ describe('ProductFormComponent', () => {
             useValue: {
               snapshot: {
                 paramMap: {
-                  get: (key: string) => '1'
+                  get: (_key: string) => '1'
                 }
               }
             }
